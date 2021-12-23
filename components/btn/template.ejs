@@ -1,0 +1,101 @@
+<%
+	const exampleData = {
+    link: {
+	    href: '/',
+	    caption: {
+		    text: 'Button'
+	    },
+	    icon: {
+		    name: 'arrow-right',
+		    position: 'after'
+	    }
+    },
+
+		defaultButton: {
+			caption: {
+				text: 'Button'
+			}
+		},
+
+		buttonIconOnly: {
+			caption: {
+				text: 'Button',
+				isHidden: true
+			},
+			icon: {
+				name: 'arrow-right'
+			}
+		}
+	}
+%>
+
+<%
+const defaults = require('./data.json').data
+const params = (typeof data === 'undefined') ? defaults : {...defaults, ...data}
+const {
+	extraClasses,
+	extraAttrs,
+	type,
+	href,
+	icon,
+	caption,
+	disabled,
+} = params
+%>
+
+<%
+	const iconBody = () => {
+    if (!icon) return ''
+    return `
+			<svg class="btn__icon i-icon">
+				<use href="#icon-${icon.name}"></use>
+			</svg>
+		`
+	}
+
+	const btnBody = () => {
+    let classes = 'btn__caption'
+		if (caption.isHidden) classes += ' visually-hidden'
+		return `
+			${icon.position !== 'after' ? iconBody() : ''}
+			<span class="${classes}">${caption.text}</span>
+			${icon.position === 'after' ? iconBody() : ''}
+		`
+	}
+
+  let classes = 'btn'
+	let dataAttrs = ''
+	if (icon && caption.isHidden) {
+		classes += ' btn--icon-only'
+	} else {
+		dataAttrs += 'data-js-btn'
+	}
+	if (extraClasses) classes += ` ${extraClasses}`
+%>
+
+<% if (href) { %>
+	<a
+		class="<%= classes %>"
+		href="<%= href %>"
+		title="<%= caption.text %>"
+		aria-label="<%= caption.text %>"
+		<%- dataAttrs %>
+		<%- extraAttrs %>
+	>
+		<%- btnBody() %>
+	</a>
+<% } else { %>
+	<button
+		class="<%= classes %>"
+		type="<%= type %>"
+		title="<%= caption.text %>"
+		aria-label="<%= caption.text %>"
+		<% if (disabled) { %>
+			disabled
+		<% } %>
+		<%- dataAttrs %>
+		<%- extraAttrs %>
+	>
+		<%- btnBody() %>
+	</button>
+<% } %>
